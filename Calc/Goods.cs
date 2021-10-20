@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Calc
 {
-    class Goods
+    public class Goods
     {
         public int Weight { get; set; }
-        private int Length { get; set; }
-        private int Height { get; set; }
-        private int Width  { get; set; }
+        public int Length { get; set; }
+        public int Height { get; set; }
+        public int Width  { get; set; }
 
         public Goods(int Weight,int Length, int Height, int Width)
         {
@@ -20,5 +21,11 @@ namespace Calc
             this.Height = Height;
             this.Width = Width;
         }
+
+        public Goods()
+        {
+
+        }
+
     }
 }
