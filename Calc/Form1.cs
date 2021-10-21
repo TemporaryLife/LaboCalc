@@ -29,7 +29,6 @@ namespace Calc
 
         private void Form1_Load(object sender, EventArgs e)                         //Начальная конфигурация (Внешний вид) формы
         {
-            MessageBox.Show(Directory.GetCurrentDirectory());
             var json_array = JsonConvert.DeserializeObject<List<Goods>>(json);
             timer1.Enabled = true;
             for (int i = 0; i < json_array.Count; i++)
@@ -39,7 +38,7 @@ namespace Calc
                 if (y <= 850)
 
                 {
-                    ShowVidgets(x1, x2, y, all_scrolls, json_array[i].Weight, i+1);
+                    ShowVidgets(x1, x2, y, all_scrolls, json_array[i].Name, i+1);
                     y += 50;
                 }
 
@@ -48,7 +47,7 @@ namespace Calc
                     y = 100;
                     x2 += 350;
                     x1 += 350;
-                    ShowVidgets(x1, x2, y, all_scrolls, json_array[i].Weight, i+1);
+                    ShowVidgets(x1, x2, y, all_scrolls, json_array[i].Name, i+1);
                     
                 }
                 
@@ -57,7 +56,7 @@ namespace Calc
         }
 
 
-        public void ShowVidgets(int x1, int x2, int y, List<NumericUpDown> all_scrolls, int pos_text, int pos_order)
+        public void ShowVidgets(int x1, int x2, int y, List<NumericUpDown> all_scrolls, string pos_text, int pos_order)
         {
             /* Данная функция организует единицу интерфейса, т.е. создает Label с названием товара, NumUpDown с количеством этого товара
             и разграничительной линией. x1 - абсцисса метки, x2 - абсцисса счетчика позиций, y -универсальная ордината для метки и счетчика
@@ -100,7 +99,7 @@ namespace Calc
         {
 
             int res = 0, sum=0;
-            Goods resGood = new Goods(0, 0, 0, 0);
+            Goods resGood = new Goods(" ", 0, 0, 0, 0);
             for (int i=0; i<all_scrolls.Count; i++)
 
                 if (all_scrolls[i].Value == 0)
@@ -158,7 +157,7 @@ namespace Calc
                 if (y <= 850)
 
                 {
-                    ShowVidgets(x1, x2, y, all_scrolls, json_array[json_array.Count-1].Weight, json_array.Count);
+                    ShowVidgets(x1, x2, y, all_scrolls, json_array[json_array.Count-1].Name, json_array.Count);
                     y += 50;
                 }
 

@@ -25,7 +25,7 @@ namespace Calc
         private void button1_Click(object sender, EventArgs e)// Если нажато "Добавить"
         {
             isAdded = false; 
-            Goods new_item = new Goods(int.Parse(textBox2.Text),int.Parse(textBox3.Text),  //создание новой позиции
+            Goods new_item = new Goods(textBox1.Text, int.Parse(textBox2.Text),int.Parse(textBox3.Text),  //создание новой позиции
                 int.Parse(textBox4.Text), int.Parse(textBox5.Text));
             json_array.Add(new_item); //добавление в список всех позиций новой позиции
             isAdded = true; // Позиция добавлен - флаг поднят
