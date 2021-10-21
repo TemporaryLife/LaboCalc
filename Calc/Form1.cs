@@ -13,7 +13,7 @@ namespace Calc
         public static int x1 = 50;
         public static int x2 = 300;
         public static int y = 100;
-        static string  path = @"C:\Users\Konstantin\source\repos\TemporaryLife\LaboCalc\goods.json", json=File.ReadAllText(path);
+        static string  path = @"goods.json", json=File.ReadAllText(path);
         public static List<NumericUpDown> all_scrolls = new List<NumericUpDown>();
         public static List<Label> all_positions = new List<Label>();
         public static List<Label> all_orders = new List<Label>();
@@ -27,8 +27,9 @@ namespace Calc
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)                         //Начальная конфигурация (Внешний вид) формы
         {
+            MessageBox.Show(Directory.GetCurrentDirectory());
             var json_array = JsonConvert.DeserializeObject<List<Goods>>(json);
             timer1.Enabled = true;
             for (int i = 0; i < json_array.Count; i++)
@@ -47,6 +48,7 @@ namespace Calc
                     y = 100;
                     x2 += 350;
                     x1 += 350;
+                    ShowVidgets(x1, x2, y, all_scrolls, json_array[i].Weight, i+1);
                     
                 }
                 
@@ -67,7 +69,7 @@ namespace Calc
             order.Font=new Font("Arial", 12, FontStyle.Bold);
 
             order.Width = 30;
-            order.Text = $"{Convert.ToString(pos_order)}.";
+            order.Text = $"{Convert.ToString(pos_order)}";
             all_orders.Add(order);
             Controls.Add(order);
 
@@ -123,31 +125,31 @@ namespace Calc
             
         }
 
-        public Goods FindGabarits(Goods FirstGood, Goods SecondGood ) // Алгоритм умножения габаритов
+        public Goods FindGabarits(Goods FirstGood, Goods SecondGood )                   // Алгоритм умножения габаритов
 
         {
-            SortGabaritsOrder(FirstGood);//На всякий случай расставляем габариты по порядку
+            SortGabaritsOrder(FirstGood);                                               //На всякий случай расставляем габариты по порядку
             SortGabaritsOrder(SecondGood);
 
-            Goods res_gabarit = new Goods(); //промежуточный объект, в который каждый раз сохраняется  суммарный габарит
+            Goods res_gabarit = new Goods();                                            //промежуточный объект, в который каждый раз сохраняется  суммарный габарит
             res_gabarit.Length = FirstGood.Length + SecondGood.Length;
             res_gabarit.Height = Math.Max(FirstGood.Height, SecondGood.Height);
             res_gabarit.Width = Math.Max(FirstGood.Width, SecondGood.Width);
 
-            SortGabaritsOrder(res_gabarit);//выставляем суммарный габарит по порядку
+            SortGabaritsOrder(res_gabarit);                                             //выставляем суммарный габарит по порядку
 
             return res_gabarit;
         }
 
 
-        private void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)                          //Нажатие на кнопку "Добавить позицию"
         {
             Form Form2 = new Form2();
             Form2.Show();
             
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)                          //Нажатие на кнопку "Отобразить"
         {
             if (isAdded)
             {
@@ -167,53 +169,49 @@ namespace Calc
                     x1 += 350;
                     
                 }
-
-                if (isDeleted) //////////ОСТАНОВИЛСЯ ЗДЕСЬ!!!!!!!!!!!!!!!!!!!!!!!!!!
-                {
-                    isDeleted = false;
-
-                }
-
-
-
+                
             }
-            this.Refresh();
+            
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void timer1_Tick(object sender, EventArgs e)                    //Блокировка кнопок для защиты "От дурака"
         {
-            if (isAdded)
+            if (isAdded )
             {
                 button3.Enabled = true;
                 button2.Enabled = false;
+                button4.Enabled = false;
             }
             else
             {
                 button3.Enabled = false;
                 button2.Enabled = true;
+                button4.Enabled = true;
+
             }
+
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)  //Сохранение изменений в файл при закрытии формы
         {
             string str = JsonConvert.SerializeObject(json_array);
             File.WriteAllText(path,str);
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void button4_Click(object sender, EventArgs e)                  //Нажатие на кнопку "Удалить позицию"
         {
             Form Form3 = new Form3();
             Form3.Show();
         }
 
-        public void SortGabaritsOrder(Goods stuff) //Сортировка габаритов по возрастанию Length --> Height --> Width
+        public void SortGabaritsOrder(Goods stuff)                              //Сортировка габаритов по возрастанию Length --> Height --> Width
         {
             int a = stuff.Length;
             int b = stuff.Height;
             int c = stuff.Width;
             int min, med, max, bufer; 
             
-            if (a <= b && a <= c)  //нахождение максимального, среднего и минимального габарита для товара
+            if (a <= b && a <= c)                                               //нахождение максимального, среднего и минимального габарита для товара
             {
                 min = a;
                 if (b < c)
