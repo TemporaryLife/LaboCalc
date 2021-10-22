@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 using static Calc.Form2;
 using static Calc.Form3;
@@ -11,8 +12,8 @@ namespace Calc
     public partial class Form1 : Form
     {
         public static int x1 = 50;
-        public static int x2 = 300;
-        public static int y = 100;
+        public static int x2 = 900;
+        public static int y = 50;
         static string  path = @"goods.json", json=File.ReadAllText(path);
         public static List<NumericUpDown> all_scrolls = new List<NumericUpDown>();
         public static List<Label> all_positions = new List<Label>();
@@ -25,10 +26,12 @@ namespace Calc
 
         {
             InitializeComponent();
+
         }
 
         private void Form1_Load(object sender, EventArgs e)                         //Начальная конфигурация (Внешний вид) формы
         {
+
             var json_array = JsonConvert.DeserializeObject<List<Goods>>(json);
             timer1.Enabled = true;
             for (int i = 0; i < json_array.Count; i++)
@@ -38,18 +41,17 @@ namespace Calc
                 if (y <= 850)
 
                 {
-                    ShowVidgets(x1, x2, y, all_scrolls, json_array[i].Name, i+1);
                     y += 50;
                 }
 
                 else
                 {
                     y = 100;
-                    x2 += 350;
-                    x1 += 350;
-                    ShowVidgets(x1, x2, y, all_scrolls, json_array[i].Name, i+1);
-                    
+                    x2 += 950;
+                    x1 += 950;
                 }
+
+                ShowVidgets(x1, x2, y, all_scrolls, json_array[i].Name, i+1);
                 
             }
             Console.ReadLine();
@@ -83,6 +85,7 @@ namespace Calc
             position.Font=new Font("Arial", 12, FontStyle.Bold);
             position.BackColor = Color.Transparent;
             position.Text = Convert.ToString(pos_text);
+            position.AutoSize = true;
             all_positions.Add(position);
             Controls.Add(position);
 
@@ -98,7 +101,8 @@ namespace Calc
         private void button1_Click(object sender, EventArgs e)
         {
 
-            int res = 0, sum=0;
+            double res = 0;
+            int sum = 0;
             Goods resGood = new Goods(" ", 0, 0, 0, 0);
             for (int i=0; i<all_scrolls.Count; i++)
 
@@ -117,6 +121,7 @@ namespace Calc
                         resGood = FindGabarits(resGood, json_array[i]);
                     }
 
+                    
                 }
 
             resGood.Weight = res;
@@ -157,24 +162,40 @@ namespace Calc
                 if (y <= 850)
 
                 {
-                    ShowVidgets(x1, x2, y, all_scrolls, json_array[json_array.Count-1].Name, json_array.Count);
                     y += 50;
+                    ShowVidgets(x1, x2, y, all_scrolls, json_array[json_array.Count-1].Name, json_array.Count);
+                    
+                    
                 }
 
                 else
                 {
                     y = 100;
-                    x2 += 350;
-                    x1 += 350;
+                    x2 += 950;
+                    x1 += 950;
+                    ShowVidgets(x1, x2, y, all_scrolls, json_array[json_array.Count-1].Name, json_array.Count);
                     
                 }
                 
             }
             
         }
-
+        int i;
+        Preview pre = new Preview();
         private void timer1_Tick(object sender, EventArgs e)                    //Блокировка кнопок для защиты "От дурака"
         {
+            
+            /*i++;
+            if (i < 30)
+            {
+
+                pre.Show();
+            }*/
+            /*else
+            {
+                pre.Close();
+                this.Show();
+            }*/
             if (isAdded )
             {
                 button3.Enabled = true;
@@ -205,10 +226,10 @@ namespace Calc
 
         public void SortGabaritsOrder(Goods stuff)                              //Сортировка габаритов по возрастанию Length --> Height --> Width
         {
-            int a = stuff.Length;
-            int b = stuff.Height;
-            int c = stuff.Width;
-            int min, med, max, bufer; 
+            double a = stuff.Length;
+            double b = stuff.Height;
+            double c = stuff.Width;
+            double min, med, max, bufer; 
             
             if (a <= b && a <= c)                                               //нахождение максимального, среднего и минимального габарита для товара
             {

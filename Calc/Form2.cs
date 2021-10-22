@@ -24,12 +24,22 @@ namespace Calc
 
         private void button1_Click(object sender, EventArgs e)// Если нажато "Добавить"
         {
-            isAdded = false; 
-            Goods new_item = new Goods(textBox1.Text, int.Parse(textBox2.Text),int.Parse(textBox3.Text),  //создание новой позиции
-                int.Parse(textBox4.Text), int.Parse(textBox5.Text));
-            json_array.Add(new_item); //добавление в список всех позиций новой позиции
-            isAdded = true; // Позиция добавлен - флаг поднят
-            this.Close(); //закрытие формы добавления
+            try
+            {
+                isAdded = false; 
+                Goods new_item = new Goods(textBox1.Text, double.Parse(textBox2.Text),double.Parse(textBox3.Text),  //создание новой позиции
+                    double.Parse(textBox4.Text), double.Parse(textBox5.Text));
+                json_array.Add(new_item); //добавление в список всех позиций новой позиции
+                isAdded = true; // Позиция добавлен - флаг поднят
+                this.Close(); //закрытие формы добавления
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(
+                    "Ошибка ввода.\nПроверьте правильность введения данных (для дробных чисел используйте запятую,  а не точку).\nВсе поля должны быть заполнены",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            
             
             
         }

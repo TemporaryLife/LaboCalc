@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,6 +20,11 @@ namespace Calc
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            var prev = new Preview();
+            prev.Show();
+            prev.Refresh();
+            Thread.Sleep(1300);
+            Application.Idle += delegate { prev.Close(); };
             Application.Run(new Form1());
             
         }
