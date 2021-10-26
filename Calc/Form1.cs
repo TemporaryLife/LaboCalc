@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using static Calc.Form2;
-using static Calc.Form3;
 namespace Calc
 {
     public partial class Form1 : Form
@@ -15,13 +13,18 @@ namespace Calc
         public static int x1 = 50;
         public static int x2 = 900;
         public static int y = 50;
-        static string  path = @"goods.json", json=File.ReadAllText(path);
-        private static string path2 = @"Boxes.json", json2 = File.ReadAllText(path2);
+
+
         public static List<NumericUpDown> all_scrolls = new List<NumericUpDown>();
         public static List<Label> all_positions = new List<Label>();
         public static List<Label> all_orders = new List<Label>();
+
+
+        static string  path = @"goods.json", json=File.ReadAllText(path);
+        static string path2 = @"Boxes.json", json2 = File.ReadAllText(path2);
         public static List<Goods> json_array = JsonConvert.DeserializeObject<List<Goods>>(json);
         public static List<Goods> json_array2 = JsonConvert.DeserializeObject<List<Goods>>(json2);
+
 
         public static double BoxesWeight = 0;
         
@@ -104,15 +107,42 @@ namespace Calc
 
         private StringBuilder FindBoxToPack(List<Goods> Boxes, Goods SumOfGoodsGabarits, int n, int posCount)
         {
+            double paper_napoln = 10;
+            double paralon = 10;
             double BeautyWeight = 0;
             var InitialBox = Boxes[n];
             StringBuilder res = new StringBuilder();
 
             if (n <= 4)
             {
-                
-                
-                if (SumOfGoodsGabarits.Length > InitialBox.Length || SumOfGoodsGabarits.Height > InitialBox.Height
+                if ((/*SumOfGoodsGabarits.Length <= InitialBox.Length &&*/ SumOfGoodsGabarits.Height <= InitialBox.Height
+                                                                    && SumOfGoodsGabarits.Width <= InitialBox.Width))
+                {
+                    
+                    if (posCount >=7)
+
+                    {
+                        res.Append("BeautyBox Panda ");
+
+                        /*SumOfGoodsGabarits.Length = Math.Max(SumOfGoodsGabarits.Length, Boxes[6].Length);*/
+                        SumOfGoodsGabarits.Height = Math.Max(SumOfGoodsGabarits.Height, Boxes[6].Height);
+                        SumOfGoodsGabarits.Width = Math.Max(SumOfGoodsGabarits.Width, Boxes[6].Width);
+                        BeautyWeight = Boxes[6].Weight;
+                    }
+                    else if (posCount >=3)
+                    {
+                        res.Append("BeautyBox ");
+                        /*SumOfGoodsGabarits.Length = Math.Max(SumOfGoodsGabarits.Length, Boxes[5].Length);*/
+                        SumOfGoodsGabarits.Height = Math.Max(SumOfGoodsGabarits.Height, Boxes[5].Height);
+                        SumOfGoodsGabarits.Width = Math.Max(SumOfGoodsGabarits.Width, Boxes[5].Width);
+
+                        /*SumOfGoodsGabarits = Boxes[5];*/
+                        BeautyWeight = Boxes[5].Weight+paper_napoln;
+                        
+                    }
+                }
+
+                if (/*SumOfGoodsGabarits.Length > InitialBox.Length ||*/ SumOfGoodsGabarits.Height > InitialBox.Height
                                                                   || SumOfGoodsGabarits.Width > InitialBox.Width)
                 {
   
@@ -120,24 +150,11 @@ namespace Calc
                 }
                 else
                 {
-
-                    if (posCount >= 7)
-
-                    {
-                        res.Append("BeautyBox Panda ");
-                        SumOfGoodsGabarits = Boxes[6];
-                        BeautyWeight = Boxes[6].Weight;
-                    }
-                    else if (posCount >= 3)
-                    {
-                        res.Append("BeautyBox ");
-                        SumOfGoodsGabarits = Boxes[5];
-                        BeautyWeight = Boxes[5].Weight;
-
-                    }
+                    
+                  
 
                     res.Append(Boxes[n].Name);
-                    BoxesWeight = BeautyWeight+Boxes[n].Weight;  
+                    BoxesWeight = BeautyWeight+Boxes[n].Weight+paralon;  
                     if (posCount==0)
                     {
                         BoxesWeight = 0;
@@ -185,7 +202,7 @@ namespace Calc
                 }
 
             resGood.Weight = res;
-            MessageBox.Show($"Габариты товара: {resGood.Length}*{resGood.Height}*{resGood.Width} ({FindBoxToPack(json_array2, resGood, 0, sum)}).\n\nВес посылки: {res+BoxesWeight} грамм.\n\nВес товара(без коробок): {res} грамм.\n\nКоличество позиций: {sum}", "Result", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            MessageBox.Show($"Габариты товара: {resGood.Length}*{resGood.Height}*{resGood.Width} ({FindBoxToPack(json_array2, resGood, 0, sum)}).\n\nВес посылки: {res+BoxesWeight} грамм.\n\nВес товара(без коробок и наполнителей): {res} грамм.\n\nКоличество позиций: {sum}", "Result", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
         }
 
@@ -196,8 +213,8 @@ namespace Calc
             SortGabaritsOrder(SecondGood);
 
             Goods res_gabarit = new Goods();                                            //промежуточный объект, в который каждый раз сохраняется  суммарный габарит
-            res_gabarit.Length = FirstGood.Length + SecondGood.Length;
-            res_gabarit.Height = Math.Max(FirstGood.Height, SecondGood.Height);
+            res_gabarit.Height = FirstGood.Height + SecondGood.Height;
+            res_gabarit.Length = Math.Max(FirstGood.Length, SecondGood.Length);
             res_gabarit.Width = Math.Max(FirstGood.Width, SecondGood.Width);
 
             SortGabaritsOrder(res_gabarit);                                             //выставляем суммарный габарит по порядку
@@ -284,14 +301,34 @@ namespace Calc
             Form3.Show();
         }
 
+
+
+
+
+
         public void SortGabaritsOrder(Goods stuff)                              //Сортировка габаритов по возрастанию Length --> Height --> Width
         {
-            double a = stuff.Length;
-            double b = stuff.Height;
-            double c = stuff.Width;
-            double min, med, max, bufer; 
-            
-            if (a <= b && a <= c)                                               //нахождение максимального, среднего и минимального габарита для товара
+
+
+ 
+            double a = stuff.Height;
+            double b = stuff.Width;
+            double min, med, max, bufer;
+
+
+            if (a <= b)
+            {
+                min = a;
+                max = b;
+            }
+            else
+            {
+                min = b;
+                max = a;
+            }
+
+
+            /*if (a <= b && a <= c)                                               //нахождение максимального, среднего и минимального габарита для товара
             {
                 min = a;
                 if (b < c)
@@ -336,10 +373,10 @@ namespace Calc
                     med = c;
                     max = a;
                 }
-            }
+            }*/
             
-            stuff.Length = min;
-            stuff.Height = med;
+/*            stuff.Length = min;*/
+            stuff.Height = min;
             stuff.Width = max;
 
         }
