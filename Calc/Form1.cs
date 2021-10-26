@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using static Calc.Form2;
@@ -15,11 +16,14 @@ namespace Calc
         public static int x2 = 900;
         public static int y = 50;
         static string  path = @"goods.json", json=File.ReadAllText(path);
+        private static string path2 = @"Boxes.json", json2 = File.ReadAllText(path2);
         public static List<NumericUpDown> all_scrolls = new List<NumericUpDown>();
         public static List<Label> all_positions = new List<Label>();
         public static List<Label> all_orders = new List<Label>();
-
         public static List<Goods> json_array = JsonConvert.DeserializeObject<List<Goods>>(json);
+        public static List<Goods> json_array2 = JsonConvert.DeserializeObject<List<Goods>>(json2);
+
+        public static double BoxesWeight = 0;
         
 
         public Form1()
@@ -33,6 +37,7 @@ namespace Calc
         {
 
             var json_array = JsonConvert.DeserializeObject<List<Goods>>(json);
+            List<Goods> json_array2 = JsonConvert.DeserializeObject<List<Goods>>(json2);
             timer1.Enabled = true;
             for (int i = 0; i < json_array.Count; i++)
 
@@ -97,13 +102,67 @@ namespace Calc
 
         }
 
+        private StringBuilder FindBoxToPack(List<Goods> Boxes, Goods SumOfGoodsGabarits, int n, int posCount)
+        {
+            double BeautyWeight = 0;
+            var InitialBox = Boxes[n];
+            StringBuilder res = new StringBuilder();
 
+            if (n <= 4)
+            {
+                
+                
+                if (SumOfGoodsGabarits.Length > InitialBox.Length || SumOfGoodsGabarits.Height > InitialBox.Height
+                                                                  || SumOfGoodsGabarits.Width > InitialBox.Width)
+                {
+  
+                    return FindBoxToPack(Boxes, SumOfGoodsGabarits, n + 1, posCount);
+                }
+                else
+                {
+
+                    if (posCount >= 7)
+
+                    {
+                        res.Append("BeautyBox Panda ");
+                        SumOfGoodsGabarits = Boxes[6];
+                        BeautyWeight = Boxes[6].Weight;
+                    }
+                    else if (posCount >= 3)
+                    {
+                        res.Append("BeautyBox ");
+                        SumOfGoodsGabarits = Boxes[5];
+                        BeautyWeight = Boxes[5].Weight;
+
+                    }
+
+                    res.Append(Boxes[n].Name);
+                    BoxesWeight = BeautyWeight+Boxes[n].Weight;  
+                    if (posCount==0)
+                    {
+                        BoxesWeight = 0;
+                        res.Clear();
+                        res.Append("Нет позиций для сортировки в коробку");
+                    }
+                    
+                    return res;
+                }
+            }
+            else
+            {
+
+                res.Clear();
+                res.Append("Нет подходящей коробки");
+                return res;
+            }
+            
+        }
         private void button1_Click(object sender, EventArgs e)
         {
-
+            
+            Goods resGood = new Goods(" ", 0, 0, 0, 0);
             double res = 0;
             int sum = 0;
-            Goods resGood = new Goods(" ", 0, 0, 0, 0);
             for (int i=0; i<all_scrolls.Count; i++)
 
                 if (all_scrolls[i].Value == 0)
@@ -122,11 +181,12 @@ namespace Calc
                     }
 
                     
+
                 }
 
             resGood.Weight = res;
-            MessageBox.Show($"Габариты: {resGood.Length}*{resGood.Height}*{resGood.Width}, вес посылки: {res} грамм. \nКоличество позиций: {sum}", "Result", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-            
+            MessageBox.Show($"Габариты товара: {resGood.Length}*{resGood.Height}*{resGood.Width} ({FindBoxToPack(json_array2, resGood, 0, sum)}).\n\nВес посылки: {res+BoxesWeight} грамм.\n\nВес товара(без коробок): {res} грамм.\n\nКоличество позиций: {sum}", "Result", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+
         }
 
         public Goods FindGabarits(Goods FirstGood, Goods SecondGood )                   // Алгоритм умножения габаритов
